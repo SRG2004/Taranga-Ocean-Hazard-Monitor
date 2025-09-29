@@ -2,6 +2,29 @@
 const { admin } = require('../../config/firebase');
 const User = require('../models/user');
 
+exports.login = async (req, res) => {
+    const { email, password } = req.body;
+
+    // TODO: Add actual authentication logic here
+    // For now, we'll just return a dummy token
+    if (email && password) {
+        res.status(200).send({ token: 'dummy-token' });
+    } else {
+        res.status(400).send({ error: 'Email and password are required.' });
+    }
+};
+
+exports.register = async (req, res) => {
+    const { email, password } = req.body;
+
+    // TODO: Add actual registration logic here
+    if (email && password) {
+        res.status(201).send({ message: 'User registered successfully.' });
+    } else {
+        res.status(400).send({ error: 'Email and password are required.' });
+    }
+};
+
 exports.verifyToken = async (req, res) => {
     const { firebaseToken } = req.body;
 
