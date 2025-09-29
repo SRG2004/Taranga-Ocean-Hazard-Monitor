@@ -6,6 +6,7 @@ const authMiddleware = require('../../middleware/authMiddleware');
 
 router.use(authMiddleware);
 
+router.post('/', socialController.createSocialPost);
 router.get('/summary', socialController.getSocialSummary);
 router.get('/posts', socialController.getSocialPosts);
 

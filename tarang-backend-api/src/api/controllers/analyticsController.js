@@ -1,6 +1,5 @@
 
 const axios = require('axios');
-const db = require('../../db');
 
 exports.triggerHotspotAnalysis = async (req, res) => {
     const { bbox, timeWindow, epsMeters } = req.body;

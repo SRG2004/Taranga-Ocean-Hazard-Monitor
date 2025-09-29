@@ -1,6 +1,6 @@
+
 const { admin } = require('../../config/firebase');
-const db = require('../../db');
-const { v4: uuidv4 } = require('uuid'); // Using uuid for primary keys
+const User = require('../models/user');
 
 exports.verifyToken = async (req, res) => {
     const { firebaseToken } = req.body;
@@ -10,25 +10,26 @@ exports.verifyToken = async (req, res) => {
     }
 
     try {
-        const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
-        const { uid, email } = decodedToken;
+        // const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
+        // const { uid, email } = decodedToken;
 
-        let user = await db('users').where({ firebase_uid: uid }).first();
+        // let user = await User.findOne({ firebaseId: uid });
 
-        if (!user) {
-            const newUser = {
-                id: uuidv4(),
-                firebase_uid: uid,
-                email: email,
-                role: 'citizen' // Default role
-            };
-            [user] = await db('users').insert(newUser).returning('*');
-        }
+        // if (!user) {
+        //     // Create a new user if not found
+        //     const newUser = new User({
+        //         firebaseId: uid,
+        //         email: email,
+        //         username: email.split('@')[0], // Default username
+        //         name: email.split('@')[0], // Default name
+        //     });
+        //     user = await newUser.save();
+        // }
 
-        res.status(200).send({ 
-            userId: user.id,
-            role: user.role 
-        });
+        // res.status(200).send({ 
+        //     userId: user._id,
+        //     username: user.username
+        // });
 
     } catch (error) {
         console.error('Error verifying Firebase token:', error);

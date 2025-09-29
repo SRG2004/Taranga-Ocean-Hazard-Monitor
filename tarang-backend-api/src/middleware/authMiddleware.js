@@ -1,6 +1,6 @@
 
 const { admin } = require('../config/firebase');
-const db = require('../db');
+const User = require('../api/models/user');
 
 const authMiddleware = async (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -13,7 +13,7 @@ const authMiddleware = async (req, res, next) => {
 
     try {
         const decodedToken = await admin.auth().verifyIdToken(idToken);
-        const user = await db('users').where({ firebase_uid: decodedToken.uid }).first();
+        const user = await User.findOne({ firebase_uid: decodedToken.uid });
 
         if (!user) {
             return res.status(404).send({ error: 'User not found.' });

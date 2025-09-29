@@ -3,21 +3,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import '../App.css';
 
-// Mock Data
-const users = [
-  { id: 1, name: 'John Doe', role: 'Researcher', status: 'Active', lastLogin: '2025-09-28 10:30 AM' },
-  { id: 2, name: 'Jane Smith', role: 'Government', status: 'Inactive', lastLogin: '2025-09-27 05:45 PM' },
-  { id: 3, name: 'Peter Jones', role: 'Admin', status: 'Active', lastLogin: '2025-09-28 11:00 AM' },
-];
-
-const activityLogs = [
-  { id: 1, user: 'Peter Jones', action: 'Updated user roles', timestamp: '2025-09-28 11:02 AM' },
-  { id: 2, user: 'John Doe', action: 'Ran a simulation', timestamp: '2025-09-28 10:45 AM' },
-];
-
-const roles = ['Admin', 'Researcher', 'Government', 'Public', 'Fishermen'];
-const permissions = ['Read Data', 'Write Data', 'Delete Data', 'Manage Users'];
-
 const donations = [
     { donor: 'Ravi Kumar', type: 'Monetary', amount: '₹5,000', date: '2025-09-28' },
     { donor: 'Priya Sharma', type: 'Resource', amount: '100 Blankets', date: '2025-09-28' },
