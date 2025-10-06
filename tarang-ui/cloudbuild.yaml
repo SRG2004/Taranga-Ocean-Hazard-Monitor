@@ -1,0 +1,13 @@
+steps:
+- name: 'gcr.io/cloud-builders/npm:lts'
+  args: ['install']
+- name: 'gcr.io/cloud-builders/npm:lts'
+  args: ['run', 'build']
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    gcloud run deploy tarang-ui --image gcr.io/$PROJECT_ID/tarang-ui --platform managed --region asia-south1 --allow-unauthenticated
+images:
+- 'gcr.io/$PROJECT_ID/tarang-ui'

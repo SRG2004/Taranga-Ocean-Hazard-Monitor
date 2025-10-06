@@ -7,6 +7,7 @@ const mediaRoutes = require('./api/routes/media');
 const usersRoutes = require('./api/routes/users');
 const socialRoutes = require('./api/routes/social');
 const trendsRoutes = require('./api/routes/trends');
+const aiInsightsRoutes = require('./api/routes/ai-insights'); // Added this line
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use('/api/media', mediaRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/social', socialRoutes);
 app.use('/api/trends', trendsRoutes);
+app.use('/api/ai-insights', aiInsightsRoutes); // Added this line
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

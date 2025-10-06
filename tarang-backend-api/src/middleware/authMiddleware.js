@@ -1,6 +1,5 @@
-
-const { admin } = require('../config/firebase');
-const User = require('../api/models/user');
+const { supabase } = require('../config/supabase');
+const User = require('../api/models/user'); // Assuming you have a User model
 
 const authMiddleware = async (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -9,21 +8,28 @@ const authMiddleware = async (req, res, next) => {
         return res.status(401).send({ error: 'Unauthorized: No token provided.' });
     }
 
-    const idToken = authHeader.split('Bearer ')[1];
+    const token = authHeader.split('Bearer ')[1];
 
     try {
-        const decodedToken = await admin.auth().verifyIdToken(idToken);
-        const user = await User.findOne({ firebase_uid: decodedToken.uid });
+        const { data: { user }, error } = await supabase.auth.getUser(token);
 
-        if (!user) {
+        if (error || !user) {
+            console.error('Error verifying token:', error);
+            return res.status(403).send({ error: 'Unauthorized: Invalid token.' });
+        }
+
+        // Assuming your local User model is linked via a 'supabase_id' field
+        const localUser = await User.findOne({ supabase_id: user.id });
+
+        if (!localUser) {
             return res.status(404).send({ error: 'User not found.' });
         }
 
-        req.user = user; // Attach user object to the request object
+        req.user = localUser; // Attach the local user object to the request
         next();
     } catch (error) {
-        console.error('Error verifying token:', error);
-        return res.status(403).send({ error: 'Unauthorized: Invalid token.' });
+        console.error('Unhandled error in auth middleware:', error);
+        return res.status(500).send({ error: 'Internal server error.' });
     }
 };
 

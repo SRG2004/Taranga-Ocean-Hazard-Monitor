@@ -1,61 +1,44 @@
-
-const { admin } = require('../../config/firebase');
-const User = require('../models/user');
+const { supabase } = require('../../config/supabase'); // Assuming you create a supabase config file
 
 exports.login = async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    // TODO: Add actual authentication logic here
-    // For now, we'll just return a dummy token
-    if (email && password) {
-        res.status(200).send({ token: 'dummy-token' });
-    } else {
-        res.status(400).send({ error: 'Email and password are required.' });
-    }
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    res.status(200).send({ user: data.user, session: data.session });
+  } catch (error) {
+    res.status(401).send({ error: error.message });
+  }
 };
 
 exports.register = async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password, ...otherData } = req.body;
 
-    // TODO: Add actual registration logic here
-    if (email && password) {
-        res.status(201).send({ message: 'User registered successfully.' });
-    } else {
-        res.status(400).send({ error: 'Email and password are required.' });
-    }
+  try {
+    const { data, error } = await supabase.auth.signUp(
+      { email, password },
+      { data: otherData } // You can pass additional user metadata here
+    );
+    if (error) throw error;
+    res.status(201).send({ user: data.user });
+  } catch (error) {
+    res.status(400).send({ error: error.message });
+  }
 };
 
 exports.verifyToken = async (req, res) => {
-    const { firebaseToken } = req.body;
+  const { token } = req.body;
 
-    if (!firebaseToken) {
-        return res.status(401).send({ error: 'Firebase token is required.' });
-    }
+  if (!token) {
+    return res.status(401).send({ error: 'Access token is required.' });
+  }
 
-    try {
-        // const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
-        // const { uid, email } = decodedToken;
-
-        // let user = await User.findOne({ firebaseId: uid });
-
-        // if (!user) {
-        //     // Create a new user if not found
-        //     const newUser = new User({
-        //         firebaseId: uid,
-        //         email: email,
-        //         username: email.split('@')[0], // Default username
-        //         name: email.split('@')[0], // Default name
-        //     });
-        //     user = await newUser.save();
-        // }
-
-        // res.status(200).send({ 
-        //     userId: user._id,
-        //     username: user.username
-        // });
-
-    } catch (error) {
-        console.error('Error verifying Firebase token:', error);
-        res.status(403).send({ error: 'Invalid or expired token.' });
-    }
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (error) throw error;
+    res.status(200).send({ user });
+  } catch (error) {
+    res.status(401).send({ error: error.message });
+  }
 };

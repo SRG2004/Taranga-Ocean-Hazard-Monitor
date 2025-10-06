@@ -98,3 +98,4 @@ New folder/
 # Firebase service account key (if sensitive)
 *.json
 !tarang-backend-api/.env.example
+.vercel
