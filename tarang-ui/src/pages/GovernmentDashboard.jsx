@@ -18,55 +18,57 @@ const GovernmentDashboard = () => {
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Government Official Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="page-content">
+      <div className="page-header">
+        <h1>Government Official Dashboard</h1>
+      </div>
+      <div className="dashboard-grid">
 
         {/* Real-Time Alerts Panel */}
-        <div className="bg-white p-4 rounded-lg shadow md:col-span-2">
-          <h2 className="text-xl font-semibold mb-2">Send Alert</h2>
+        <div className="dashboard-card" style={{gridColumn: 'span 2'}}>
+          <h2>Send Alert</h2>
           <form onSubmit={handleSendAlert}>
-            <div className="mb-4">
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
-              <input type="text" name="title" id="title" value={alert.title} onChange={handleInputChange} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+            <div style={{marginBottom: '15px'}}>
+              <label htmlFor="title" style={{display: 'block', marginBottom: '5px', fontWeight: '600'}}>Title</label>
+              <input type="text" name="title" id="title" value={alert.title} onChange={handleInputChange} style={{width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '6px'}} />
             </div>
-            <div className="mb-4">
-              <label htmlFor="message" className="block text-sm font-medium text-gray-700">Message</label>
-              <textarea name="message" id="message" value={alert.message} onChange={handleInputChange} rows="3" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+            <div style={{marginBottom: '15px'}}>
+              <label htmlFor="message" style={{display: 'block', marginBottom: '5px', fontWeight: '600'}}>Message</label>
+              <textarea name="message" id="message" value={alert.message} onChange={handleInputChange} rows="3" style={{width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '6px'}}></textarea>
             </div>
-            <div className="mb-4">
-              <label htmlFor="priority" className="block text-sm font-medium text-gray-700">Priority</label>
-              <select name="priority" id="priority" value={alert.priority} onChange={handleInputChange} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <div style={{marginBottom: '15px'}}>
+              <label htmlFor="priority" style={{display: 'block', marginBottom: '5px', fontWeight: '600'}}>Priority</label>
+              <select name="priority" id="priority" value={alert.priority} onChange={handleInputChange} style={{width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '6px'}}>
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
               </select>
             </div>
-            <button type="submit" className="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Send Alert</button>
+            <button type="submit" style={{width: '100%', backgroundColor: '#dc3545', color: 'white', padding: '10px', border: 'none', borderRadius: '6px', cursor: 'pointer'}}>Send Alert</button>
           </form>
         </div>
 
         {/* Priority Notifications Feed */}
-        <div className="bg-white p-4 rounded-lg shadow md:col-span-1">
-          <h2 className="text-xl font-semibold mb-2">Priority Notifications</h2>
+        <div className="dashboard-card">
+          <h2>Priority Notifications</h2>
           <p>Priority notifications will be displayed here.</p>
         </div>
 
         {/* Interactive Map */}
-        <div className="bg-white p-4 rounded-lg shadow col-span-1 md:col-span-3">
-          <h2 className="text-xl font-semibold mb-2">Interactive Map with Live Hazard Zones</h2>
+        <div className="dashboard-card" style={{gridColumn: 'span 3'}}>
+          <h2>Interactive Map with Live Hazard Zones</h2>
           <HazardMap />
         </div>
 
         {/* Decision Support Panel */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-2">Decision Support</h2>
+        <div className="dashboard-card">
+          <h2>Decision Support</h2>
           <p>Decision support panel will be here.</p>
         </div>
 
         {/* Emergency Contacts Directory */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-2">Emergency Contacts</h2>
+        <div className="dashboard-card">
+          <h2>Emergency Contacts</h2>
           <p>Emergency contacts directory will be here.</p>
         </div>
 

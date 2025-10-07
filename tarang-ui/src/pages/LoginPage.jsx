@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { supabase } from '../supabase';
 import '../App.css';
 
 const LoginPage = () => {
@@ -24,14 +25,28 @@ const LoginPage = () => {
     setError('');
 
     try {
-      const { user, error } = await signIn(email, password);
+      const { data, error } = await signIn(email, password);
 
       if (error) {
-        throw new Error(error);
+        throw new Error(error.message);
       }
 
-      if (user) {
-        const userRoles = user.roles || ['public'];
+      if (data.user) {
+        // Fetch the user profile to get roles
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
+
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+          // Default to public if profile fetch fails
+          navigate('/');
+          return;
+        }
+
+        const userRoles = profile.roles || ['public'];
         const primaryRole = userRoles[0];
 
         switch (primaryRole) {
@@ -51,11 +66,15 @@ const LoginPage = () => {
             navigate('/');
         }
       } else {
-          setError('Login failed. Please try again.')
+        setError('Login failed. Please try again.');
       }
 
     } catch (err) {
-      setError(err.message || 'Invalid email or password. Please try again.');
+      if (err.message.includes('Email not confirmed')) {
+        setError('Please confirm your email address before logging in. Check your inbox for the confirmation link.');
+      } else {
+        setError(err.message || 'Invalid email or password. Please try again.');
+      }
     }
   };
 

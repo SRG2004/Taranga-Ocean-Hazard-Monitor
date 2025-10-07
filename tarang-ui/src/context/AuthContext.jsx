@@ -36,13 +36,37 @@ export function AuthProvider({ children }) {
       async (_event, session) => {
         const user = session?.user;
         if (user) {
-          const { data: profile, error } = await supabase
+          let { data: profile, error } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', user.id)
             .single();
 
-          if (error) {
+          if (error && error.code === 'PGRST116') { // Profile not found
+            // Create profile from user metadata
+            const userData = user.user_metadata;
+            const { data: newProfile, error: insertError } = await supabase
+              .from('profiles')
+              .insert({
+                id: user.id,
+                email: user.email,
+                firstName: userData.firstName || '',
+                lastName: userData.lastName || '',
+                phone: userData.phone || '',
+                country: userData.country || '',
+                roles: userData.roles || ['citizen']
+              })
+              .select()
+              .single();
+
+            if (insertError) {
+              console.error('Error creating profile:', insertError);
+              setCurrentUser(user);
+            } else {
+              profile = newProfile;
+              setCurrentUser({ ...user, ...profile });
+            }
+          } else if (error) {
             console.error('Error fetching profile:', error);
             setCurrentUser(user);
           } else {
@@ -67,23 +91,17 @@ export function AuthProvider({ children }) {
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
+            options: {
+                data: userData
+            }
         });
 
         if (error) {
             return { data, error };
         }
 
-        if (data.user) {
-            const { error: profileError } = await supabase
-                .from('profiles')
-                .insert({ id: data.user.id, ...userData, email });
-
-            if (profileError) {
-                return { data, error: profileError };
-            }
-        }
-        
-        // Sign in the user to create a session immediately
+        // Profile will be created automatically by the database trigger
+        // Sign in immediately since email confirmation is disabled
         return supabase.auth.signInWithPassword({ email, password });
     },
     signIn: (email, password) => supabase.auth.signInWithPassword({ email, password }),

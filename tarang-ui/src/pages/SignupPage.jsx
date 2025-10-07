@@ -30,23 +30,34 @@ const SignupPage = () => {
       });
 
       if (error) {
-        throw new Error(error);
+        throw new Error(error.message);
       }
 
-      navigate('/login', { state: { fromSignup: true } });
+      // User is now signed in and profile created, navigate to dashboard
+      navigate('/');
 
     } catch (err) {
-      setError(err.message || 'Failed to sign up. The email might already be in use.');
+      setError(err.message || 'Failed to sign up. Please try again later.');
     }
   };
 
   return (
-    <div className="auth-page">
-      <motion.div 
-        className="auth-card"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
+    <div className="page-content page-content-home">
+      <motion.div
+        className="hero-section"
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        <h1>Join Tarang</h1>
+        <p>Create your account to access comprehensive ocean hazard monitoring and early warning systems</p>
+      </motion.div>
+
+      <motion.div
+        className="auth-section"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5, duration: 0.8 }}
       >
         <h2>Create an Account</h2>
         {error && <p className="error-message">{error}</p>}
@@ -81,7 +92,6 @@ const SignupPage = () => {
               <option value="citizen">Citizen</option>
               <option value="researcher">Researcher/Analyst</option>
               <option value="government">Government Official</option>
-              <option value="maritime">Maritime Personnel</option>
               <option value="admin">Admin</option>
             </select>
           </div>

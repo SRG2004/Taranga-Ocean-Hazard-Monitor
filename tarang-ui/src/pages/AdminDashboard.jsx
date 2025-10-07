@@ -1,8 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { fetchUsers } from '../utils/api';
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [roles, setRoles] = useState(['admin', 'researcher', 'government', 'citizen']);
+  const [permissions, setPermissions] = useState({
+    admin: ['read', 'write', 'delete'],
+    researcher: ['read', 'write'],
+    government: ['read', 'write'],
+    citizen: ['read']
+  });
+  const [notifications, setNotifications] = useState({
+    admin: true,
+    researcher: true,
+    government: true,
+    citizen: false
+  });
+  const [systemHealth, setSystemHealth] = useState({
+    dataFeed: 'Active',
+    apiStatus: 'Online',
+    storageUsage: '45%'
+  });
 
   useEffect(() => {
     const getUsers = async () => {
@@ -16,74 +36,145 @@ const AdminDashboard = () => {
     getUsers();
   }, []);
 
+  const handleRoleChange = (userId, newRole) => {
+    setUsers(users.map(user => user.id === userId ? { ...user, roles: [newRole] } : user));
+  };
+
+  const handleNotificationToggle = (role) => {
+    setNotifications({ ...notifications, [role]: !notifications[role] });
+  };
+
+  const exportReport = (format) => {
+    alert(`Exporting report in ${format} format`);
+  };
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        
+    <div className="page-content">
+      <div className="page-header">
+        <h1>Admin Dashboard</h1>
+        <p>Manage users, roles, and system settings</p>
+      </div>
+      <div className="dashboard-grid">
+
         {/* User Management Panel */}
-        <div className="bg-white p-4 rounded-lg shadow col-span-1 md:col-span-2">
-          <h2 className="text-xl font-semibold mb-2">User Management</h2>
-          <table className="min-w-full bg-white">
+        <motion.div className="dashboard-card" style={{gridColumn: 'span 2'}} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <h2>User Management Panel</h2>
+          <table style={{width: '100%', borderCollapse: 'collapse'}}>
             <thead>
               <tr>
-                <th className="py-2">Name</th>
-                <th className="py-2">Email</th>
-                <th className="py-2">Roles</th>
-                <th className="py-2">Actions</th>
+                <th style={{padding: '10px', border: '1px solid #ddd'}}>Name</th>
+                <th style={{padding: '10px', border: '1px solid #ddd'}}>Role</th>
+                <th style={{padding: '10px', border: '1px solid #ddd'}}>Status</th>
+                <th style={{padding: '10px', border: '1px solid #ddd'}}>Last Login</th>
               </tr>
             </thead>
             <tbody>
               {users.map(user => (
                 <tr key={user.id}>
-                  <td className="border px-4 py-2">{user.name}</td>
-                  <td className="border px-4 py-2">{user.email}</td>
-                  <td className="border px-4 py-2">{user.roles.join(', ')}</td>
-                  <td className="border px-4 py-2">
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">Edit</button>
-                    <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>
+                  <td style={{padding: '10px', border: '1px solid #ddd'}}>{user.name}</td>
+                  <td style={{padding: '10px', border: '1px solid #ddd'}}>
+                    <select value={user.roles[0]} onChange={(e) => handleRoleChange(user.id, e.target.value)}>
+                      {roles.map(role => <option key={role} value={role}>{role}</option>)}
+                    </select>
                   </td>
+                  <td style={{padding: '10px', border: '1px solid #ddd'}}>Active</td>
+                  <td style={{padding: '10px', border: '1px solid #ddd'}}>2023-10-01</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
+        </motion.div>
 
         {/* Role & Permission Manager */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-2">Role & Permission Manager</h2>
-          <p>Role and permission management tools will be here.</p>
-        </div>
+        <motion.div className="dashboard-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}>
+          <h2>Role & Permission Manager</h2>
+          {roles.map(role => (
+            <div key={role} style={{marginBottom: '10px'}}>
+              <h4>{role}</h4>
+              {permissions[role].map(perm => (
+                <label key={perm} style={{display: 'block', marginLeft: '10px'}}>
+                  <input type="checkbox" defaultChecked /> {perm}
+                </label>
+              ))}
+            </div>
+          ))}
+        </motion.div>
 
         {/* System Activity Logs */}
-        <div className="bg-white p-4 rounded-lg shadow col-span-1 md:col-span-2">
-          <h2 className="text-xl font-semibold mb-2">System Activity Logs</h2>
-          <p>System activity logs will be displayed here.</p>
-        </div>
+        <motion.div className="dashboard-card" style={{gridColumn: 'span 2'}} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }}>
+          <h2>System Activity Logs</h2>
+          <div style={{marginBottom: '10px'}}>
+            <select style={{marginRight: '10px'}}>
+              <option>All Users</option>
+              <option>Admin</option>
+              <option>Researcher</option>
+            </select>
+            <select>
+              <option>All Actions</option>
+              <option>Login</option>
+              <option>Update</option>
+            </select>
+          </div>
+          <table style={{width: '100%', borderCollapse: 'collapse'}}>
+            <thead>
+              <tr>
+                <th style={{padding: '5px', border: '1px solid #ddd'}}>User</th>
+                <th style={{padding: '5px', border: '1px solid #ddd'}}>Action</th>
+                <th style={{padding: '5px', border: '1px solid #ddd'}}>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={{padding: '5px', border: '1px solid #ddd'}}>John Doe</td>
+                <td style={{padding: '5px', border: '1px solid #ddd'}}>Login</td>
+                <td style={{padding: '5px', border: '1px solid #ddd'}}>2023-10-01 10:00</td>
+              </tr>
+            </tbody>
+          </table>
+        </motion.div>
 
         {/* Notifications Manager */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-2">Notifications Manager</h2>
-          <p>Notification management tools will be here.</p>
-        </div>
+        <motion.div className="dashboard-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.5 }}>
+          <h2>Notifications Manager</h2>
+          {Object.keys(notifications).map(role => (
+            <div key={role} style={{display: 'flex', justifyContent: 'space-between', marginBottom: '10px'}}>
+              <span>{role}</span>
+              <label>
+                <input type="checkbox" checked={notifications[role]} onChange={() => handleNotificationToggle(role)} />
+              </label>
+            </div>
+          ))}
+        </motion.div>
 
         {/* System Health Overview */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-2">System Health Overview</h2>
-          <p>System health status will be displayed here.</p>
-        </div>
+        <motion.div className="dashboard-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.5 }}>
+          <h2>System Health Overview</h2>
+          <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
+            <div>Data Feed: <span style={{color: systemHealth.dataFeed === 'Active' ? 'green' : 'red'}}>{systemHealth.dataFeed}</span></div>
+            <div>API Status: <span style={{color: 'green'}}>{systemHealth.apiStatus}</span></div>
+            <div>Storage Usage: {systemHealth.storageUsage}</div>
+          </div>
+        </motion.div>
 
         {/* Reports Section */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-2">Reports</h2>
-          <p>Report export options will be here.</p>
-        </div>
+        <motion.div className="dashboard-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0, duration: 0.5 }}>
+          <h2>Reports Section</h2>
+          <div style={{display: 'flex', gap: '10px'}}>
+            <button onClick={() => exportReport('CSV')} style={{backgroundColor: 'var(--primary-color)', color: 'white', padding: '10px', border: 'none', borderRadius: '4px', cursor: 'pointer'}}>Export CSV</button>
+            <button onClick={() => exportReport('PDF')} style={{backgroundColor: 'var(--primary-color)', color: 'white', padding: '10px', border: 'none', borderRadius: '4px', cursor: 'pointer'}}>Export PDF</button>
+            <button onClick={() => exportReport('Excel')} style={{backgroundColor: 'var(--primary-color)', color: 'white', padding: '10px', border: 'none', borderRadius: '4px', cursor: 'pointer'}}>Export Excel</button>
+          </div>
+        </motion.div>
 
         {/* Customization Settings */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-2">Customization</h2>
-          <p>Customization settings will be here.</p>
-        </div>
+        <motion.div className="dashboard-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2, duration: 0.5 }}>
+          <h2>Customization Settings</h2>
+          <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
+            <div>Theme: Light/Dark</div>
+            <div>Layout: Default</div>
+            <div>Dashboard Widgets: Enabled</div>
+          </div>
+        </motion.div>
 
       </div>
     </div>

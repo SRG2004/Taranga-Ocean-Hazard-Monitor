@@ -1,13 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-
-// Dummy data for hazard hotspots
-const hazardHotspots = [
-  { id: 1, position: [12.9716, 77.5946], name: 'Hazard Spot 1', description: 'High risk of flooding.' },
-  { id: 2, position: [12.972, 77.6], name: 'Hazard Spot 2', description: 'Landslide warning.' },
-  { id: 3, position: [12.975, 77.59], name: 'Hazard Spot 3', description: 'Earthquake prone zone.' },
-];
+import { supabase } from '../supabase';
 
 // Fix for default marker icon
 delete L.Icon.Default.prototype._getIconUrl;
@@ -18,16 +12,84 @@ L.Icon.Default.mergeOptions({
 });
 
 const HazardMap = () => {
+  const [hazards, setHazards] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchHazards = async () => {
+      const { data, error } = await supabase
+        .from('hazards')
+        .select('*')
+        .eq('status', 'verified'); // Only show verified hazards
+
+      if (error) {
+        console.error('Error fetching hazards:', error);
+      } else {
+        setHazards(data);
+      }
+      setLoading(false);
+    };
+
+    fetchHazards();
+  }, []);
+
+  const getMarkerIcon = (severity) => {
+    let color;
+    switch (severity) {
+      case 'critical': color = 'red'; break;
+      case 'high': color = 'orange'; break;
+      case 'medium': color = 'yellow'; break;
+      case 'low': color = 'green'; break;
+      default: color = 'blue';
+    }
+
+    return new L.Icon({
+      iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    });
+  };
+
+  if (loading) {
+    return <div>Loading map...</div>;
+  }
+
   return (
-    <MapContainer center={[12.9716, 77.5946]} zoom={13} style={{ height: '400px', width: '100%' }}>
+    <MapContainer center={[20.5937, 78.9629]} zoom={5} style={{ height: '400px', width: '100%' }}>
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      {hazardHotspots.map(hotspot => (
-        <Marker key={hotspot.id} position={hotspot.position}>
+      {hazards.map(hazard => (
+        <Marker
+          key={hazard.id}
+          position={[hazard.lat, hazard.lng]}
+          icon={getMarkerIcon(hazard.severity)}
+        >
           <Popup>
-            <b>{hotspot.name}</b><br />{hotspot.description}
+            <div>
+              <h4>{hazard.type} - {hazard.severity}</h4>
+              <p>{hazard.description}</p>
+              <p><strong>Location:</strong> {hazard.location}</p>
+              <p><strong>Reported:</strong> {new Date(hazard.created_at).toLocaleString()}</p>
+              {hazard.media_urls && hazard.media_urls.length > 0 && (
+                <div>
+                  <strong>Media:</strong>
+                  {hazard.media_urls.map((url, index) => (
+                    <div key={index}>
+                      {url.includes('.mp4') || url.includes('.webm') ? (
+                        <video src={url} controls style={{maxWidth: '200px'}} />
+                      ) : (
+                        <img src={url} alt={`Media ${index + 1}`} style={{maxWidth: '200px'}} />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </Popup>
         </Marker>
       ))}

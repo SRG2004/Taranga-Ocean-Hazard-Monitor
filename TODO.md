@@ -21,7 +21,7 @@
 - Update src/App.js to include route for / (Home).
 - Confirm and test home layout/animations.
 
-## 4. Remaining Pages [ ]
+## 4. Remaining Pages [x]
 - Create src/pages/VolunteerRegistration.js: Animated form in Card.
 - Create src/pages/CitizenDashboard.js: Welcome + grid of 5 animated Cards.
 - Create src/pages/Reports.js: Tabs + loading spinner animation.

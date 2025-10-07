@@ -9,23 +9,25 @@ const FishermanDashboard = () => {
   ];
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Fisherman Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="page-content">
+      <div className="page-header">
+        <h1>Fisherman Dashboard</h1>
+      </div>
+      <div className="dashboard-grid">
 
         {/* Daily Safe Fishing Zones Map */}
-        <div className="bg-white p-4 rounded-lg shadow col-span-1 md:col-span-2 lg:col-span-3">
-          <h2 className="text-xl font-semibold mb-2">Safe Fishing Zones and Hazard Hotspots</h2>
+        <div className="dashboard-card" style={{gridColumn: 'span 3'}}>
+          <h2>Safe Fishing Zones and Hazard Hotspots</h2>
           <HazardMap />
         </div>
 
         {/* Safety Alerts */}
-        <div className="bg-white p-4 rounded-lg shadow col-span-1 md:col-span-2 lg:col-span-3">
-          <h2 className="text-xl font-semibold mb-2">Safety Alerts</h2>
-          <div className="space-y-2">
+        <div className="dashboard-card" style={{gridColumn: 'span 3'}}>
+          <h2>Safety Alerts</h2>
+          <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
             {safetyAlerts.map(alert => (
-              <div key={alert.id} className="p-3 bg-red-100 border-l-4 border-red-500 text-red-700">
-                <p className="font-bold">{alert.title}</p>
+              <div key={alert.id} style={{padding: '15px', backgroundColor: '#f8d7da', borderLeft: '4px solid #dc3545', color: '#721c24'}}>
+                <p style={{fontWeight: 'bold'}}>{alert.title}</p>
                 <p>{alert.message}</p>
               </div>
             ))}
@@ -33,20 +35,20 @@ const FishermanDashboard = () => {
         </div>
 
         {/* Tide & Wave Graphs */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-2">Tides & Waves</h2>
+        <div className="dashboard-card">
+          <h2>Tides & Waves</h2>
           <p>Tide and wave graphs will be displayed here.</p>
         </div>
 
         {/* Wind Speed & Direction Compass */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-2">Wind Conditions</h2>
+        <div className="dashboard-card">
+          <h2>Wind Conditions</h2>
           <p>Wind speed and direction compass will be displayed here.</p>
         </div>
 
         {/* Real-time Weather Updates */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-2">Real-time Weather</h2>
+        <div className="dashboard-card">
+          <h2>Real-time Weather</h2>
           <p>Weather updates will be displayed here.</p>
         </div>
 

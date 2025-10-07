@@ -6,33 +6,73 @@ const Sidebar = ({ isOpen, toggleSidebar, handleLogout }) => {
     const { user, isAuthenticated } = useAuth();
     const userRoles = user?.roles || [];
 
-    const links = [
-        { path: '/', label: 'Home', public: true },
-        { path: '/donations', label: 'Donations', public: true },
-        { path: '/profile', label: 'Profile', public: false },
-        { path: '/volunteer', label: 'Volunteer', public: false },
-        { path: '/social', label: 'Social Monitoring', public: false },
-        { path: '/admin', label: 'Admin Dashboard', roles: ['admin'] },
-        { path: '/researcher', label: 'Researcher Dashboard', roles: ['researcher'] },
-        { path: '/government', label: 'Government Dashboard', roles: ['government'] },
-        { path: '/citizen', label: 'Citizen Dashboard', roles: ['citizen'] },
-        { path: '/fisherman', label: 'Fisherman Dashboard', roles: ['citizen'] },
-    ];
+    // Define role-based navigation links
+    const getRoleBasedLinks = () => {
+        const isAdmin = userRoles.includes('admin');
+        const isResearcher = userRoles.includes('researcher');
+        const isGovernment = userRoles.includes('government');
+        const isCitizen = !isAdmin && !isResearcher && !isGovernment;
 
-    const finalLinks = links.filter(link => {
-        if (link.public) return true;
-        if (!isAuthenticated) return false;
-        if (link.roles) {
-            return link.roles.some(role => userRoles.includes(role));
+        const links = [
+            { path: '/', label: 'Home', public: true },
+            { path: '/donations', label: 'Donations', public: true },
+        ];
+
+        if (!isAuthenticated) return links;
+
+        if (isAdmin) {
+            // Admin navigation
+            links.push(
+                { path: '/dashboard', label: 'User Management' },
+                { path: '/reports', label: 'Reports Management' },
+                { path: '/analytics', label: 'System Analytics' },
+                { path: '/settings', label: 'Settings' },
+                { path: '/support', label: 'Data Export / Backup' }
+            );
+        } else if (isResearcher) {
+            // Researcher navigation
+            links.push(
+                { path: '/analytics', label: 'Data Analytics' },
+                { path: '/map', label: 'Map Visualization' },
+                { path: '/hazard-analysis', label: 'AI/NLP Insights' },
+                { path: '/reports', label: 'Compare & Export' }
+            );
+        } else if (isGovernment) {
+            // Government official navigation
+            links.push(
+                { path: '/dashboard', label: 'Incident Overview' },
+                { path: '/map', label: 'Live Map' },
+                { path: '/official', label: 'Alerts & Notifications' },
+                { path: '/reports', label: 'Response Coordination' },
+                { path: '/analytics', label: 'Reports' }
+            );
+        } else {
+            // Citizen/Fisherman navigation
+            links.push(
+                { path: '/report-hazard', label: 'Submit Report' },
+                { path: '/reports', label: 'My Reports' },
+                { path: '/map', label: 'Nearby Hazards' },
+                { path: '/social-posts', label: 'Safety Alerts' },
+                { path: '/support', label: 'Awareness & Tips' }
+            );
         }
-        return true; // For authenticated links without specific roles
-    });
+
+        return links;
+    };
+
+    const finalLinks = getRoleBasedLinks();
 
     return (
         <nav className={`sidebar ${isOpen ? 'open' : ''}`}>
             <div className="logo">
                 <NavLink to="/" onClick={toggleSidebar}>Tarang</NavLink>
             </div>
+            {isAuthenticated && user && (
+                <div className="user-info">
+                    <div className="user-name">{user.email}</div>
+                    <div className="user-role">Role: {userRoles.length > 0 ? userRoles.join(', ') : 'Citizen'}</div>
+                </div>
+            )}
             <div className="nav-menu">
                 {finalLinks.map((link, index) => (
                     <NavLink key={index} to={link.path} className="nav-link" onClick={toggleSidebar}>
@@ -40,13 +80,7 @@ const Sidebar = ({ isOpen, toggleSidebar, handleLogout }) => {
                     </NavLink>
                 ))}
             </div>
-            <div className="auth-links">
-                {isAuthenticated ? (
-                    <button onClick={() => { handleLogout(); toggleSidebar(); }} className="nav-link">Logout</button>
-                ) : (
-                    <NavLink to="/login" className="nav-link" onClick={toggleSidebar}>Login</NavLink>
-                )}
-            </div>
+
         </nav>
     );
 };
